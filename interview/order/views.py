@@ -22,9 +22,7 @@ class DeactivateOrderView(generics.APIView):
         orders = Order.objects.filter(id=kwargs['id'])
         if not orders:
             return Response(serializer.errors, status=400)
-        orders.update(is_active=True)
+        orders.update(is_active=False)
         serializer = self.serializer_class(orders, data=orders, partial=True)
-
-        serializer.save()
         
         return Response(serializer.data, status=200)
