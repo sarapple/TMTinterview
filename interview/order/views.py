@@ -13,3 +13,18 @@ class OrderListCreateView(generics.ListCreateAPIView):
 class OrderTagListCreateView(generics.ListCreateAPIView):
     queryset = OrderTag.objects.all()
     serializer_class = OrderTagSerializer
+
+class DeactivateOrderView(generics.APIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    def patch(self, request: Request, *args, **kwargs) -> Response:
+        orders = Order.objects.filter(id=kwargs['id'])
+        if not orders:
+            return Response(serializer.errors, status=400)
+        orders.update(is_active=True)
+        serializer = self.serializer_class(orders, data=orders, partial=True)
+
+        serializer.save()
+        
+        return Response(serializer.data, status=200)
