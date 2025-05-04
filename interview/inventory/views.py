@@ -6,6 +6,21 @@ from interview.inventory.models import Inventory, InventoryLanguage, InventoryTa
 from interview.inventory.schemas import InventoryMetaData
 from interview.inventory.serializers import InventoryLanguageSerializer, InventorySerializer, InventoryTagSerializer, InventoryTypeSerializer
 
+class InventoryListView(APIView):
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+    
+    def get(self, request: Request, *args, **kwargs) -> Response:
+        created_at = request.query_params.get('created_at__gt')
+        inventory = self.get_queryset()
+        if created_at is not None:
+            inventory.filter(created_at__gt=created_at)
+        serializer = self.serializer_class(inventory, many=True)
+        
+        return Response(serializer.data, status=200)
+    
+    def get_queryset(self):
+        return self.queryset.all()
 
 class InventoryListCreateView(APIView):
     queryset = Inventory.objects.all()
